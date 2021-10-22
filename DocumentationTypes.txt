@@ -1,1 +1,12 @@
 https://www.altexsoft.com/blog/business/technical-documentation-in-software-development-types-best-practices-and-tools/
+Activity diagrams
+Are graphical representations of workflows of stepwise activities and actions[1] with support for choice, iteration and concurrency.
+User Flows
+A user flow is a diagram that shows the actions and/or steps that a user can or will go through when using your product or service within a given scenario, with emphasis placed on red-routes, or important series of tasks that are used to get to a particular result within your process.
+Wireframing 
+Is an initial process of design layout creation. 
+It’s an outline that represents the main groups of content and shows the general features of an interface. 
+It contains gray boxes, lines, buttons, and sample text. 
+The purpose of a wireframe is to outline how the interface works without getting into graphic details, allowing the team to assess the basics of user interaction early. 
+Also, the simplicity of a wireframe allows a designer to rework some features of a layout. Wireframe can be static or interactive. 
+Static wireframe can be sketched, even on a paper, while interactive wireframe allows a person to click through it and test the functionality.
