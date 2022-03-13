@@ -57,8 +57,8 @@ class TimeTracker:
             self.__time_stamp[currentApp] = int(time.time())
             time.sleep(1)
             self.__active_usage_time[currentApp] = self.__active_usage_time[currentApp] + int(time.time()) - \
-                                                   self.__time_stamp[currentApp]
-           # print(self.__active_usage_time)
+                                                  self.__time_stamp[currentApp]
+            print(self.__active_usage_time)
         self.each_app_usage_time()
 
 
@@ -76,7 +76,7 @@ class TimeTracker:
             time.sleep(1)
             self.__active_time[self.__active_applications[active_program]] = \
                 self.__active_time[self.__active_applications[active_program]]+datetime.now()-current_time
-            print(self.__active_time)
+            #print(self.__active_time)
 
     # Return the number of opened apps
     def get_open_applications(self):
