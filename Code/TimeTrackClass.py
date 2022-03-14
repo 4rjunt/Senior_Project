@@ -11,6 +11,7 @@ from datetime import datetime,timedelta
 import time
 import win32process
 import threading
+import multiprocessing
 
 
 class TimeTracker:
@@ -39,7 +40,7 @@ class TimeTracker:
         threading.Thread(target=self.__new_program_open,args=(current_app,current_app_pid)).start()
         threading.Thread(target=self.__stop_watch, args=(current_app, current_app_pid)).start()
         if not self.__active_checking_enable:
-            self.__check_programs_active()
+            multiprocessing.Process(target=self.__check_programs_active,daemon=True).run()
             self.__active_checking_enable = True
 
     # Creates a new item in the 3 dictionaries, the first dictionary contain the name of the program and its pid
@@ -49,34 +50,32 @@ class TimeTracker:
         if currentApp not in self.__active_applications.values():
             self.__active_usage_time[currentApp] = 0
             self.__active_applications[currentAppPid] = currentApp
-            self.__active_time[currentApp] = timedelta(0,0,0)
+            self.__active_time[currentApp] = 0
 
     # Calculate the usage time of the application that the user is currently using
     def __stop_watch(self,currentApp,currentAppPid):
         while currentAppPid == (win32process.GetWindowThreadProcessId(GetForegroundWindow())[1]):
             self.__time_stamp[currentApp] = int(time.time())
             time.sleep(1)
-            self.__active_usage_time[currentApp] = self.__active_usage_time[currentApp] + int(time.time()) - \
-                                                  self.__time_stamp[currentApp]
-            print(self.__active_usage_time)
+            self.__active_usage_time[currentApp] += int(time.time()) - self.__time_stamp[currentApp]
         self.each_app_usage_time()
 
+    # Calculate the active time of the application that the user have open
+    def __stop_watch2(self, active_program):
+        self.__active_checking_applications.append(active_program)
+        while active_program in (program.ppid() for program in psutil.process_iter()):
+            current_time = int(time.time())
+            time.sleep(1)
+            self.__active_time[self.__active_applications[active_program]] += int(time.time()) - current_time
+            print(self.__active_time)
 
     # Executes an algorithm that check when a program is closed, while calculate the active time of all the programs opened
     def __check_programs_active(self):
-        for activePrograms in set(self.__active_applications)-set(self.__active_checking_applications):
-            threading.Thread(target=self.__stop_watch2,args=[activePrograms]).start()
-            self.__check_programs_active()
-
-    # Calculate the active time of the application that the user have open
-    def __stop_watch2(self,active_program):
-        self.__active_checking_applications.append(active_program)
-        while active_program in (program.ppid() for program in psutil.process_iter()):
-            current_time = datetime.now()
-            time.sleep(1)
-            self.__active_time[self.__active_applications[active_program]] = \
-                self.__active_time[self.__active_applications[active_program]]+datetime.now()-current_time
-            #print(self.__active_time)
+        while True:
+            for activePrograms in set(self.__active_applications)-set(self.__active_checking_applications):
+                p = multiprocessing.Process(target=self.__stop_watch2(activePrograms),daemon=True)
+                p.start()
+                p.join()
 
     # Return the number of opened apps
     def get_open_applications(self):
