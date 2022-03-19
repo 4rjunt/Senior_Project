@@ -1,7 +1,5 @@
-from datetime import datetime
-import time
+from TimeTrackClass import *
 
-while True:
-    _date1 = datetime.today()
-    print(_date1)
-    time.sleep(.5)
+if __name__ == "__main__":
+    timeTracker = TimeTracker()
+
