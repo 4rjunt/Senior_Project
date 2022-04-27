@@ -1,0 +1,9 @@
+explorer
+ScreenClippingHost
+ShellExperienceHost
+ApplicationFrameHost
+PickerHost
+SearchHost
+StarMenuExperienceHost
+Taskmgr
+python

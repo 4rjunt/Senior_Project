@@ -1,18 +1,25 @@
+'''
+Database Table Models
+Made by: Justin Nunez
+Date: 3/1/2022
+Description: Create the blueprints of the database and the tables inside of it 
+'''
 from sqlalchemy import  create_engine, Column, Integer, String, ForeignKey, Date, Interval, Time
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql.sqltypes import Boolean
-from datetime import timedelta,time,date
+from datetime import timedelta,date
 from os.path import exists
-from pathlib import Path
+import os
 
 Base = declarative_base()
+
+# Definition of tables with its values for the database
 
 class Usage_Date(Base):
     __tablename__= "UsageDate"
     date = Column(Date,primary_key=True,autoincrement=False,default=date.today())
     programs_used_id = relationship("Usage_Time",cascade="all,delete",backref=backref("Usage_Date"))
-    computer_usage_time = Column(Time,default=time(hour=0,minute=0,second=0),nullable=False)
+    computer_usage_time = Column(Interval,nullable=False,default=timedelta(hours=0,minutes=0,seconds=0))
 
     def __repr__(self) -> str:
         return f"Usage Date object: Date: {self.date}. Computer Usage Time: {self.computer_usage_time}"
@@ -22,9 +29,9 @@ class Usage_Time(Base):
     program_usage_id = Column(Integer,primary_key=True)
     process_id = Column(Integer,unique=True,nullable=False)
     program_name = Column(String(100),nullable=False)
-    usage_time = Column(Time,nullable=False)
-    active_time = Column(Time,nullable=False)
-    date = Column(Date,ForeignKey(Usage_Date.date))
+    usage_time = Column(Interval,nullable=False)
+    active_time = Column(Interval,nullable=False)
+    date = Column(Date,ForeignKey('UsageDate.date'))
 
     def __repr__(self) -> str:
         return f"UsageTime object: Program Usage Id: {self.program_usage_id}. PID: {self.process_id}. " \
@@ -32,15 +39,19 @@ class Usage_Time(Base):
 
 class Block_Apps(Base):
     __tablename__ = "BlockApps"
-    program_pid = Column(Integer,primary_key=True,autoincrement=False)
+    program_blocked_id = Column(Integer,primary_key=True)
     program_name = Column(String(100),nullable=False)
-    time_to_block = Column(Interval,nullable=False)
+    time_to_block = Column(Interval,nullable=False,default=timedelta(hours=0,minutes=0,seconds=0))
 
     def __repr__(self) -> str:
         return f"BlockApps object: Program PID: {self.program_pid}. Program Name: {self.program_name}." \
                f"Time To Lock:{self.time_to_block}"
 
+# Check if the folder exists, if not creates one
+if not exists("Save"):
+    os.mkdir("Save")
 
-if not exists("database\\test.db"):
-    engine = create_engine('sqlite:///C:\\Users\\Desktop\\Desktop\\SQLite\\database\\test.db')
+# Check if the database exists, if not create one
+if not exists("Save\\Kairos.db"):
+    engine = create_engine('sqlite:///Save\\Kairos.db')
     Base.metadata.create_all(engine)
